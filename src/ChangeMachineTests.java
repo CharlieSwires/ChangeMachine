@@ -76,8 +76,8 @@ class ChangeMachineTests {
 
     @Test
     void test8() { //close but ran out of coins
-        List<Integer> change = changeMachine.changeRecursive(Arrays.asList(10, 5, 2, 2, 2),6);
-        int[] array = {2,2,2};
+        List<Integer> change = changeMachine.changeRecursive(Arrays.asList(10, 5, 2, 2, 2, 2),8);
+        int[] array = {2,2,2,2};
         List<Integer> expectedResult = toList(array);
         Assertions.assertEquals(expectedResult,change);
     }

@@ -82,17 +82,18 @@ public class ChangeMachine {
 			included[ii] = true;
 			includedResult[ii] = true;
 		}
-		int result =  btree(0, coins, i);
-		System.out.println("result="+result);
-		List<Integer> result2 = new ArrayList<>();
-		int j = 0;
-		for(Boolean inout: includedResult) {
-			if (inout)result2.add(coins.get(j));
-			j++;
+		try {
+			int result =  btree(0, coins, i);
+			List<Integer> result2 = boolToList(includedResult, coins);
+			System.out.println("result2="+result2);			
+			throw new RuntimeException(listToSb(result2).toString());		} 
+		catch(RuntimeException e) {
+			List<Integer> result2 = boolToList(includedResult, coins);
+			System.out.println("result2="+result2);
+			return result2;
 		}
-		System.out.println("result2="+result2);
-		return result2;
 	}
+	
 	int sum2 = 0;
 	int btree(int depth, List<Integer> c, int i){
 		System.out.print("depth="+depth+" i="+i);
@@ -102,30 +103,55 @@ public class ChangeMachine {
 			sum += c.get(ii)*(included[ii]?1:0);
 		}
 		System.out.println(" sum="+sum);
-//		if (!done) {
 
-			if (depth >= (included.length -1)) return sum;
-			if (depth >= 1 && sum > i && included[depth-1] && (c.get(depth-1) + c.get(depth)) > i){
-				included[depth-1] = false;
-				btree(depth-1, c, i);
-				sum -= c.get(depth-1);
+		if (depth >= (included.length -1)) return sum;
+		if (depth >= 1 && sum > i && included[depth-1] && (c.get(depth-1) + c.get(depth)) > i){
+			included[depth-1] = false;
+			btree(depth-1, c, i);
+			sum -= c.get(depth-1);
+		}
+		if (depth >= 2 && sum > i && included[depth-1] && included[depth-2] && (c.get(depth-2) + c.get(depth-1) + c.get(depth)) > i){
+			included[depth-2] = false;
+			btree(depth-2, c, i);
+			sum -= c.get(depth-2);
+		}
+		if (sum > i && included[depth]){
+			included[depth] = false;
+			btree(depth, c, i);
+			sum -= c.get(depth);
+		}
+		sum2 = btree(depth+1, c, i);
+		if (sum2 == i) {
+			for(int ii = 0; ii < included.length; ii++) {
+				includedResult[ii] = included[ii];
 			}
-			if (sum > i && included[depth]){
-				included[depth] = false;
-				btree(depth, c, i);
-				sum -= c.get(depth);
-			}
-			sum2 = btree(depth+1, c, i);
-			if (sum2 == i) {
-				for(int ii = 0; ii < included.length; ii++) {
-					includedResult[ii] = included[ii];
-				}
-				System.out.println(Arrays.toString(includedResult));
-				return sum;
-			} 
+			System.out.println(Arrays.toString(includedResult));
+			throw new RuntimeException("found");
+		} 
 
-//		}
 		return sum;
 
+	}
+
+	static StringBuilder listToSb(List<Integer> list) {
+		StringBuilder sb = new StringBuilder();
+		int ii = 0;
+		for(Integer item: list) {
+			if (ii++==0) {
+				sb.append(item);
+			}else {
+				sb.append(","+item);
+			}
+		}
+		return sb;
+	}
+	static List<Integer> boolToList(Boolean[] b, List<Integer> c){
+		List<Integer> result2 = new ArrayList<>();
+		int j = 0;
+		for(Boolean inout: b) {
+			if (inout)result2.add(c.get(j));
+			j++;
+		}
+		return result2;
 	}
 }
